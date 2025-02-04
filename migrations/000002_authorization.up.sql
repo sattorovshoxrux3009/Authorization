@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS`Users` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `username` VARCHAR(255) NOT NULL UNIQUE,
+    `password` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(255),
+    `auth_time` TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS `Subjects` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `Users_subjects` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT UNSIGNED NOT NULL,
+    `subject_id` INT UNSIGNED NOT NULL,
+    `score` DECIMAL(5, 2),
+    FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`),
+    FOREIGN KEY (`subject_id`) REFERENCES `Subjects`(`id`)
+);
