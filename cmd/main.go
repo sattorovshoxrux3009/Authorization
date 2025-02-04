@@ -1,12 +1,12 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
 
 	"GitHub.com/sattorovshohruh3009/Authorization/config"
+	"GitHub.com/sattorovshohruh3009/Authorization/server"
 	"GitHub.com/sattorovshohruh3009/Authorization/storage"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -34,10 +34,13 @@ func main() {
 	fmt.Println("Connection succs!")
 
 	strg := storage.NewStorage(db)
-	user_subject, err := strg.User().UpdatePassword(context.TODO(), "shohruh", "Shohruh2004")
-	if err != nil {
-		log.Fatal("error::::", err)
+
+	router := server.NewServer(&server.Options{
+		Strg: strg,
+	})
+
+	if err = router.Run(cfg.Port); err != nil {
+		log.Fatal("Error starting server: ", err)
 	}
-	fmt.Println(user_subject)
 
 }

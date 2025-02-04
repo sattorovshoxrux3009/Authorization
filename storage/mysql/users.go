@@ -20,7 +20,7 @@ func NewUserStorage(db *sql.DB) repo.UserStorageI {
 	}
 }
 
-func (r *UserRepo) Create(ctx context.Context, req *repo.UserCreate) (*repo.UserCreate, error) {
+func (r *UserRepo) Create(ctx context.Context, req *repo.UserCreate) (*repo.User, error) {
 	query := `
 		INSERT INTO Users (
 			username,
@@ -32,7 +32,13 @@ func (r *UserRepo) Create(ctx context.Context, req *repo.UserCreate) (*repo.User
 		return nil, err
 	}
 
-	return req, nil
+	query = "SELECT id, username, password FROM Users ORDER BY id DESC LIMIT 1"
+	var newUser repo.User
+	err = r.db.QueryRow(query).Scan(&newUser.Id, &newUser.Username, &newUser.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &newUser, nil
 }
 
 func (r *UserRepo) Get(ctx context.Context, usrname string) (*repo.User, error) {
@@ -53,33 +59,25 @@ func (r *UserRepo) Get(ctx context.Context, usrname string) (*repo.User, error) 
 		&authTime,
 	)
 
-	// Agar foydalanuvchi topilmasa
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("user with username %s not found", usrname)
 	}
-
-	// Boshqa xatoliklar
 	if err != nil {
 		return nil, err
 	}
 
-	// token uchun
 	if token.Valid {
 		user.Token = token.String
 	} else {
-		user.Token = "NULL" // NULL bo'lsa, bo'sh string
+		user.Token = "NULL"
 	}
-
-	// auth_time uchun
 	if authTime != nil {
-		// []byte ni time.Time ga o'zgartirish
 		parsedTime, err := time.Parse("2006-01-02 15:04:05", string(authTime))
 		if err != nil {
 			return nil, fmt.Errorf("error parsing auth_time: %v", err)
 		}
 		user.Auth_time = parsedTime
 	} else {
-		// NULL bo'lsa, bo'sh vaqt (zero time)
 		user.Auth_time = time.Time{}
 	}
 
@@ -140,4 +138,16 @@ func (r *UserRepo) UpdatePassword(ctx context.Context, username, newPassword str
 	}
 
 	return &user, nil
+}
+
+func (r *UserRepo) UpdateToken(ctx context.Context, username, token string) error {
+	authTime := time.Now().Add(5 * time.Hour)
+	query := `
+		UPDATE Users 
+			SET token = ?, 
+			auth_time = ? 
+		WHERE username = ?;
+	`
+	_, err := r.db.Exec(query, token, authTime, username)
+	return err
 }
