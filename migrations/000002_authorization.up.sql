@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `Users_subjects` (
     `user_id` INT UNSIGNED NOT NULL,
     `subject_id` INT UNSIGNED NOT NULL,
     `score` DECIMAL(5, 2),
+    `subject_name` VARCHAR(255),
     FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`),
     FOREIGN KEY (`subject_id`) REFERENCES `Subjects`(`id`)
 );

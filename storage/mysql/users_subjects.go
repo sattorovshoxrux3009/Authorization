@@ -57,36 +57,25 @@ func (r *users_subjectsRepo) GetById(ctx context.Context, id int) (*repo.Users_S
 	return &subj, nil
 }
 
-func (r *users_subjectsRepo) GetByUserID(ctx context.Context, userId int) ([]repo.Users_Subjects, error) {
-	query := "SELECT id, user_id, subject_id, score FROM Users_subjects WHERE user_id = ?"
-	rows, err := r.db.Query(query, userId)
+func (r *users_subjectsRepo) GetByUserID(ctx context.Context, userID int) ([]repo.Users_Subjects, error) {
+	query := `SELECT us.id, us.user_id, us.subject_id, COALESCE(us.score, 0) as score, s.name as subject_name 
+	          FROM Users_subjects us 
+	          JOIN Subjects s ON us.subject_id = s.id 
+	          WHERE us.user_id = ?`
+
+	rows, err := r.db.QueryContext(ctx, query, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	var subjects []repo.Users_Subjects
-
 	for rows.Next() {
-		var subj repo.Users_Subjects
-		var score sql.NullFloat64
-
-		err := rows.Scan(&subj.Id, &subj.UserId, &subj.SubjectId, &score)
-		if err != nil {
+		var subject repo.Users_Subjects
+		if err := rows.Scan(&subject.Id, &subject.UserId, &subject.SubjectId, &subject.Score, &subject.Subject_name); err != nil {
 			return nil, err
 		}
-
-		if score.Valid {
-			subj.Score = score.Float64
-		} else {
-			subj.Score = 0
-		}
-
-		subjects = append(subjects, subj)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
+		subjects = append(subjects, subject)
 	}
 
 	return subjects, nil

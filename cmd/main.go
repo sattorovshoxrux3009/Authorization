@@ -35,6 +35,13 @@ func main() {
 
 	strg := storage.NewStorage(db)
 
+	// var subjects []repo.Users_Subjects
+	// subjects, err = strg.Users_Subjects().GetByUserID(context.TODO(), 1)
+	// if err != nil {
+	// 	log.Fatal("error: ", err)
+	// }
+	// fmt.Println(subjects)
+
 	router := server.NewServer(&server.Options{
 		Strg: strg,
 	})

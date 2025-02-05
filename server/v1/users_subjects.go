@@ -21,7 +21,7 @@ func (h *handlerV1) GetUserSubjects(ctx *gin.Context) {
 		return
 	}
 
-	// User ID bo‘yicha fanlarni olish
+	// User ID bo‘yicha fanlarni olish (endi subject_name ham bor)
 	subjects, err := h.strg.Users_Subjects().GetByUserID(ctx, user.Id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Fanlar topilmadi"})

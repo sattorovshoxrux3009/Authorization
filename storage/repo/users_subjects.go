@@ -10,8 +10,9 @@ type Users_SubjectsStorageI interface {
 	Update(ctx context.Context, id int, req Users_Subjects) (*Users_Subjects, error)
 }
 type Users_Subjects struct {
-	Id        int
-	UserId    int
-	SubjectId int
-	Score     float64
+	Id           int
+	UserId       int
+	SubjectId    int
+	Score        float64
+	Subject_name string
 }
