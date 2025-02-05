@@ -151,3 +151,13 @@ func (r *UserRepo) UpdateToken(ctx context.Context, username, token string) erro
 	_, err := r.db.Exec(query, token, authTime, username)
 	return err
 }
+
+func (r *UserRepo) GetToken(ctx context.Context, userId int) (string, error) {
+	var token string
+	err := r.db.QueryRowContext(ctx, "SELECT token FROM Users WHERE id = ?", userId).Scan(&token)
+	if err != nil {
+		return "", err 
+	}
+
+	return token, nil
+}

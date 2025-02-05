@@ -1,7 +1,6 @@
 package server
 
 import (
-	"GitHub.com/sattorovshohruh3009/Authorization/server/middleware"
 	v1 "GitHub.com/sattorovshohruh3009/Authorization/server/v1"
 	"GitHub.com/sattorovshohruh3009/Authorization/storage"
 	"github.com/gin-gonic/gin"
@@ -24,9 +23,10 @@ func NewServer(opts *Options) *gin.Engine {
 	router.POST("/v1/login", handler.LoginUser)
 	// Himoyalangan API-lar (Middleware ishlaydi)
 	protected := router.Group("/v1")
-	protected.Use(middleware.AuthMiddleware()) // JWT tokenni tekshirish
+	protected.Use(handler.AuthMiddleware()) // JWT tokenni tekshirish
 	{
 		protected.GET("/user-subjects", handler.GetUserSubjects) // Foydalanuvchining fanlari
+
 	}
 	return router
 }

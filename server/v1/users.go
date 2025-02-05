@@ -48,13 +48,14 @@ func (h *handlerV1) CreateUser(ctx *gin.Context) {
 }
 
 // JWT token yaratish
-// JWT token yaratish
 func CreateJWTToken(userId int, username string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":     username,
-		"user_id": userId, // user_id ni qo'shish
-		"exp":     time.Now().Add(time.Hour).Unix(),
+		"user_id": userId,    // user_id qo'shish
+		"role":    "student", // rol qo'shish
+		"exp":     time.Now().Add(time.Minute * 30).Unix(),
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte("my_secret_key"))
 	if err != nil {
